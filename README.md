@@ -118,3 +118,10 @@ pnpm build
 ```
 
 The build pipeline uses `tsup` to emit dual ESM/CommonJS bundles plus declaration files into `dist/`. To start iterating locally you can `pnpm link --global` and consume the package in another repo via `pnpm link --global websockets-logger`.
+
+## Continuous publishing
+
+- GitHub Actions workflow: `.github/workflows/publish.yml`.
+- Trigger: every push to `main` after lint/build.
+- Publishes with `pnpm publish --access public` when the `package.json` version is not already on npm.
+- Requires an `NPM_TOKEN` repository secret with publish rights to the `websockets-logger` package.
