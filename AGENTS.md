@@ -40,11 +40,7 @@ The package uses GitHub Actions to automatically publish to npm when changes are
 
    ```bash
    git add .
-   git commit -m "Add X-API-Key header support
-
-   🤖 Generated with Claude Code
-
-   Co-Authored-By: Claude <noreply@anthropic.com>"
+   git commit -m "Add X-API-Key header support"
    git push origin main
    ```
 
