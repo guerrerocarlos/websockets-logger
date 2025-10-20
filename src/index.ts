@@ -28,7 +28,7 @@ export interface WebSocketLike {
     readyState?: number;
 }
 
-export type WebSocketFactory = (url: string) => WebSocketLike;
+export type WebSocketFactory = (url: string, headers?: Record<string, string>) => WebSocketLike;
 
 export interface WebSocketLoggerOptions {
     wsUrl: string;
@@ -43,6 +43,8 @@ export interface WebSocketLoggerOptions {
     onMessage?: (message: unknown, rawEvent: unknown) => void;
     webSocketFactory?: WebSocketFactory;
     initialContext?: Record<string, unknown>;
+    apiKey?: string;
+    headers?: Record<string, string>;
 }
 
 export interface InitializeWebSocketLoggerOptions extends WebSocketLoggerOptions {
@@ -63,6 +65,7 @@ interface NormalizedOptions {
     onConnectionChange?: (state: ConnectionState) => void;
     onMessage?: (message: unknown, rawEvent: unknown) => void;
     webSocketFactory: WebSocketFactory;
+    headers?: Record<string, string>;
 }
 
 type ListenerCleanup = () => void;
@@ -86,9 +89,14 @@ function createDefaultSource() {
     return `client-${randomSuffix()}`;
 }
 
-function defaultWebSocketFactory(url: string): WebSocketLike {
+function defaultWebSocketFactory(url: string, headers?: Record<string, string>): WebSocketLike {
     const NativeWebSocket = globalScope?.WebSocket;
     if (typeof NativeWebSocket === 'function') {
+        // Node.js 'ws' library supports headers via options object
+        // Browser WebSocket doesn't support custom headers in constructor
+        if (headers && Object.keys(headers).length > 0) {
+            return new NativeWebSocket(url, { headers } as unknown as string);
+        }
         return new NativeWebSocket(url);
     }
     throw new Error('No global WebSocket implementation found. Provide options.webSocketFactory.');
@@ -180,6 +188,13 @@ function attachListener(ws: WebSocketLike, event: WebSocketEventName, handler: W
 function normalizeOptions(options: WebSocketLoggerOptions): NormalizedOptions {
     const source = options.source ?? createDefaultSource();
 
+    // Merge apiKey into headers if provided
+    let headers: Record<string, string> | undefined = options.headers ? { ...options.headers } : undefined;
+    if (options.apiKey) {
+        headers = headers ?? {};
+        headers['X-API-Key'] = options.apiKey;
+    }
+
     return {
         wsUrl: options.wsUrl,
         source,
@@ -192,6 +207,7 @@ function normalizeOptions(options: WebSocketLoggerOptions): NormalizedOptions {
         onConnectionChange: options.onConnectionChange,
         onMessage: options.onMessage,
         webSocketFactory: options.webSocketFactory ?? defaultWebSocketFactory,
+        headers,
     };
 }
 
@@ -226,7 +242,7 @@ export class WebSocketLogger {
         this.notifyConnection('connecting');
 
         try {
-            const ws = this.options.webSocketFactory(this.options.wsUrl);
+            const ws = this.options.webSocketFactory(this.options.wsUrl, this.options.headers);
             this.ws = ws;
 
             this.eventUnsubscribers = [

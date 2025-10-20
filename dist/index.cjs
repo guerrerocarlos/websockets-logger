@@ -46,9 +46,12 @@ function createDefaultSource() {
   return `client-${randomSuffix()}`;
 }
 __name(createDefaultSource, "createDefaultSource");
-function defaultWebSocketFactory(url) {
+function defaultWebSocketFactory(url, headers) {
   const NativeWebSocket = globalScope?.WebSocket;
   if (typeof NativeWebSocket === "function") {
+    if (headers && Object.keys(headers).length > 0) {
+      return new NativeWebSocket(url, { headers });
+    }
     return new NativeWebSocket(url);
   }
   throw new Error("No global WebSocket implementation found. Provide options.webSocketFactory.");
@@ -126,6 +129,11 @@ function attachListener(ws, event, handler) {
 __name(attachListener, "attachListener");
 function normalizeOptions(options) {
   const source = options.source ?? createDefaultSource();
+  let headers = options.headers ? { ...options.headers } : void 0;
+  if (options.apiKey) {
+    headers = headers ?? {};
+    headers["X-API-Key"] = options.apiKey;
+  }
   return {
     wsUrl: options.wsUrl,
     source,
@@ -137,7 +145,8 @@ function normalizeOptions(options) {
     reconnectInterval: options.reconnectInterval ?? 5e3,
     onConnectionChange: options.onConnectionChange,
     onMessage: options.onMessage,
-    webSocketFactory: options.webSocketFactory ?? defaultWebSocketFactory
+    webSocketFactory: options.webSocketFactory ?? defaultWebSocketFactory,
+    headers
   };
 }
 __name(normalizeOptions, "normalizeOptions");
@@ -193,7 +202,7 @@ var _WebSocketLogger = class _WebSocketLogger {
     this.manualClose = false;
     this.notifyConnection("connecting");
     try {
-      const ws = this.options.webSocketFactory(this.options.wsUrl);
+      const ws = this.options.webSocketFactory(this.options.wsUrl, this.options.headers);
       this.ws = ws;
       this.eventUnsubscribers = [
         attachListener(ws, "open", this.handleOpen),

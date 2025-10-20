@@ -23,7 +23,7 @@ interface WebSocketLike {
     once?(event: WebSocketEventName, listener: WebSocketEventListener): void;
     readyState?: number;
 }
-type WebSocketFactory = (url: string) => WebSocketLike;
+type WebSocketFactory = (url: string, headers?: Record<string, string>) => WebSocketLike;
 interface WebSocketLoggerOptions {
     wsUrl: string;
     source?: string;
@@ -37,6 +37,8 @@ interface WebSocketLoggerOptions {
     onMessage?: (message: unknown, rawEvent: unknown) => void;
     webSocketFactory?: WebSocketFactory;
     initialContext?: Record<string, unknown>;
+    apiKey?: string;
+    headers?: Record<string, string>;
 }
 interface InitializeWebSocketLoggerOptions extends WebSocketLoggerOptions {
     patchConsole?: boolean;
@@ -55,6 +57,7 @@ interface NormalizedOptions {
     onConnectionChange?: (state: ConnectionState) => void;
     onMessage?: (message: unknown, rawEvent: unknown) => void;
     webSocketFactory: WebSocketFactory;
+    headers?: Record<string, string>;
 }
 declare class WebSocketLogger {
     private ws;
@@ -121,4 +124,4 @@ declare const wsLog: {
     clearContext: (keys?: string[]) => void;
 };
 
-export { type ConnectionState, type InitializeWebSocketLoggerOptions, type LogLevel, type LogMessage, type PatchConsoleOptions, type WebSocketFactory, type WebSocketLike, WebSocketLogger, type WebSocketLoggerOptions, WebSocketLogger as default, getWebSocketLogger, initializeWebSocketLogger, patchConsole, unpatchConsole, wsLog };
+export { ConnectionState, InitializeWebSocketLoggerOptions, LogLevel, LogMessage, PatchConsoleOptions, WebSocketFactory, WebSocketLike, WebSocketLogger, WebSocketLoggerOptions, WebSocketLogger as default, getWebSocketLogger, initializeWebSocketLogger, patchConsole, unpatchConsole, wsLog };
