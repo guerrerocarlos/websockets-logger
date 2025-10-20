@@ -23,7 +23,7 @@ interface WebSocketLike {
     once?(event: WebSocketEventName, listener: WebSocketEventListener): void;
     readyState?: number;
 }
-type WebSocketFactory = (url: string, headers?: Record<string, string>) => WebSocketLike;
+type WebSocketFactory = (url: string) => WebSocketLike;
 interface WebSocketLoggerOptions {
     wsUrl: string;
     source?: string;
@@ -38,7 +38,6 @@ interface WebSocketLoggerOptions {
     webSocketFactory?: WebSocketFactory;
     initialContext?: Record<string, unknown>;
     apiKey?: string;
-    headers?: Record<string, string>;
 }
 interface InitializeWebSocketLoggerOptions extends WebSocketLoggerOptions {
     patchConsole?: boolean;
@@ -57,7 +56,7 @@ interface NormalizedOptions {
     onConnectionChange?: (state: ConnectionState) => void;
     onMessage?: (message: unknown, rawEvent: unknown) => void;
     webSocketFactory: WebSocketFactory;
-    headers?: Record<string, string>;
+    apiKey?: string;
 }
 declare class WebSocketLogger {
     private ws;

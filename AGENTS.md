@@ -83,30 +83,38 @@ git push origin main
 # 5. Monitor GitHub Actions for automatic publish
 ```
 
-## API Key Header Implementation
+## API Key Authentication
 
 ### Context
-The package now supports the X-API-Key header required by `https://websockets.omattic.com/hub`.
+The package supports API key authentication for `https://websockets.omattic.com/hub` via the subscription message.
+
+### Implementation Approach
+**Subscription-Based Authentication** - API key is sent in the subscription message payload after WebSocket connection is established. This approach:
+- ✅ Works in both browser and Node.js environments
+- ✅ Browser WebSocket API doesn't support custom headers
+- ✅ Simpler implementation without special header handling
+- ✅ More flexible - can authenticate per-topic
 
 ### Usage
-Users can provide API keys in two ways:
+Provide the API key when creating the logger:
 
-1. **Using `apiKey` option (recommended):**
-   ```javascript
-   const logger = new WebSocketLogger({
-     wsUrl: 'wss://websockets.omattic.com/hub',
-     apiKey: 'your-api-key-here'
-   });
-   ```
+```javascript
+const logger = new WebSocketLogger({
+  wsUrl: 'wss://websockets.omattic.com/hub',
+  apiKey: 'your-api-key-here'
+});
+```
 
-2. **Using `headers` option:**
-   ```javascript
-   const logger = new WebSocketLogger({
-     wsUrl: 'wss://websockets.omattic.com/hub',
-     headers: {
-       'X-API-Key': 'your-api-key-here'
-     }
-   });
-   ```
+The API key is automatically included in the subscription message:
 
-The `apiKey` option is automatically merged into headers as `X-API-Key`.
+```javascript
+{
+  clientId: 'client-id',
+  action: 'subscribe',
+  topic: 'logs',
+  apiKey: 'your-api-key-here'  // ← Sent with subscription
+}
+```
+
+### Alternative: Manual Subscription (Advanced)
+If you need custom subscription logic, you can handle it manually by listening to connection events and sending your own subscription message.

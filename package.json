@@ -1,6 +1,6 @@
 {
   "name": "websockets-logger",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Lightweight WebSocket logger that forwards console output to a centralized hub.",
   "license": "MIT",
   "type": "module",
