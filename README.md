@@ -18,6 +18,7 @@ import { initializeWebSocketLogger, wsLog } from 'websockets-logger';
 initializeWebSocketLogger({
   wsUrl: 'wss://websockets.omattic.com/hub',
   source: 'my-app', // optional – defaults to host/pid + random suffix
+  apiKey: 'your-api-key', // optional – for authenticated hubs
 });
 
 wsLog.info('Hello central console');
@@ -29,6 +30,7 @@ If you prefer to keep using `console.*`, flip on the auto-patching helper:
 initializeWebSocketLogger({
   wsUrl: 'wss://websockets.omattic.com/hub',
   source: 'marketing-site',
+  apiKey: 'your-api-key', // optional – for authenticated hubs
   patchConsole: true,
 });
 ```
@@ -51,6 +53,7 @@ With `patchConsole: true` the module swaps the global console methods so every c
 | `onMessage` | – | Receive raw messages coming **from** the hub (handy if you extend the DO to push commands). |
 | `webSocketFactory` | `globalThis.WebSocket` | Supply your own implementation when running outside the browser, e.g. `() => new (require('ws'))(url)`. |
 | `initialContext` | `{}` | Key/value payload merged into every log message. Update at runtime via `logger.updateContext()`. |
+| `apiKey` | – | Optional API key for authentication. Automatically included in the subscription message payload. Works in both browser and Node.js environments. |
 | `patchConsole` | `false` | Only on `initializeWebSocketLogger`. Auto routes console calls through the logger. |
 | `consoleLevels` | all | Restrict which console methods are patched. |
 | `consolePassthrough` | mirrors `enableConsole` | When patching console, forward the call to the original console after logging. |
@@ -99,6 +102,7 @@ import { initializeWebSocketLogger } from 'websockets-logger';
 initializeWebSocketLogger({
   wsUrl: 'wss://websockets.omattic.com/hub',
   source: `worker-${process.pid}`,
+  apiKey: 'your-api-key', // optional – for authenticated hubs
   webSocketFactory: (url) => new WebSocket(url),
   patchConsole: true,
   enableConsole: true, // still prints locally
