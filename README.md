@@ -39,24 +39,24 @@ With `patchConsole: true` the module swaps the global console methods so every c
 
 ## Options
 
-| Option | Default | Notes |
-| --- | --- | --- |
-| `wsUrl` | – | Required WebSocket endpoint, e.g. `wss://websockets.omattic.com/hub` from [websockets-omattic-com](../websockets-omattic-com). |
-| `source` | hostname / pid + random | Acts as the clientId inside the Durable Object. Show up in the console UI as the emitter. |
-| `topic` | `logs` | Broadcast topic used when sending messages. Leave as-is to interoperate with the console worker and UI. |
-| `subscriptionTopic` | `source` | Initial subscription topic sent on connection. Normally you should not change this. |
-| `enableConsole` | `true` (or `false` when `patchConsole` is set) | Mirror messages to the original console methods that were present during initialization. |
-| `bufferMessages` | `true` | Queue log entry objects while the socket reconnects. |
-| `maxBufferSize` | `100` | Upper bound for the in-memory buffer. Oldest messages are dropped first. |
-| `reconnectInterval` | `5000` ms | Automatic reconnect cadence. Set to `0` to disable. |
-| `onConnectionChange` | – | `(state) => void` callback with `connecting`, `connected`, or `disconnected`. Useful for status indicators. |
-| `onMessage` | – | Receive raw messages coming **from** the hub (handy if you extend the DO to push commands). |
-| `webSocketFactory` | `globalThis.WebSocket` | Supply your own implementation when running outside the browser, e.g. `() => new (require('ws'))(url)`. |
-| `initialContext` | `{}` | Key/value payload merged into every log message. Update at runtime via `logger.updateContext()`. |
-| `apiKey` | – | Optional API key for authentication. Automatically included in the subscription message payload. Works in both browser and Node.js environments. |
-| `patchConsole` | `false` | Only on `initializeWebSocketLogger`. Auto routes console calls through the logger. |
-| `consoleLevels` | all | Restrict which console methods are patched. |
-| `consolePassthrough` | mirrors `enableConsole` | When patching console, forward the call to the original console after logging. |
+| Option               | Default                                        | Notes                                                                                                                                            |
+| -------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `wsUrl`              | –                                              | Required WebSocket endpoint, e.g. `wss://websockets.omattic.com/hub` from [websockets-omattic-com](../websockets-omattic-com).                   |
+| `source`             | hostname / pid + random                        | Acts as the clientId inside the Durable Object. Show up in the console UI as the emitter.                                                        |
+| `topic`              | `logs`                                         | Broadcast topic used when sending messages. Leave as-is to interoperate with the console worker and UI.                                          |
+| `subscriptionTopic`  | `source`                                       | Initial subscription topic sent on connection. Normally you should not change this.                                                              |
+| `enableConsole`      | `true` (or `false` when `patchConsole` is set) | Mirror messages to the original console methods that were present during initialization.                                                         |
+| `bufferMessages`     | `true`                                         | Queue log entry objects while the socket reconnects.                                                                                             |
+| `maxBufferSize`      | `100`                                          | Upper bound for the in-memory buffer. Oldest messages are dropped first.                                                                         |
+| `reconnectInterval`  | `5000` ms                                      | Automatic reconnect cadence. Set to `0` to disable.                                                                                              |
+| `onConnectionChange` | –                                              | `(state) => void` callback with `connecting`, `connected`, or `disconnected`. Useful for status indicators.                                      |
+| `onMessage`          | –                                              | Receive raw messages coming **from** the hub (handy if you extend the DO to push commands).                                                      |
+| `webSocketFactory`   | `globalThis.WebSocket`                         | Supply your own implementation when running outside the browser, e.g. `() => new (require('ws'))(url)`.                                          |
+| `initialContext`     | `{}`                                           | Key/value payload merged into every log message. Update at runtime via `logger.updateContext()`.                                                 |
+| `apiKey`             | –                                              | Optional API key for authentication. Automatically included in the subscription message payload. Works in both browser and Node.js environments. |
+| `patchConsole`       | `false`                                        | Only on `initializeWebSocketLogger`. Auto routes console calls through the logger.                                                               |
+| `consoleLevels`      | all                                            | Restrict which console methods are patched.                                                                                                      |
+| `consolePassthrough` | mirrors `enableConsole`                        | When patching console, forward the call to the original console after logging.                                                                   |
 
 ## Runtime helpers
 
